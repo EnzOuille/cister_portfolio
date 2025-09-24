@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>WatchIt?</title>
+<link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #000;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  h1 {
+    text-align: center;
+    margin: 40px 0 20px 0;
+    font-size: 3rem;
+  }
+
+  /* Barre de recherche pleine largeur */
+  #search-container {
+    width: 90%;
+    max-width: 600px;
+  }
+
+  #movie-search {
+    width: 100%;
+  }
+
+  .ts-control {
+    border-radius: 25px !important;
+    padding: 10px 15px;
+  }
+
+  /* Résultat sélectionné */
+  #movie-details {
+    margin-top: 40px;
+    text-align: center;
+    width: 90%;
+    max-width: 600px;
+  }
+
+  #movie-details img {
+    max-width: 100%;
+    border-radius: 10px;
+    margin: 10px 0;
+  }
+
+  #movie-details p {
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  /* Résultats avec affiches dans TomSelect */
+  .ts-dropdown .option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .ts-dropdown .option img {
+    width: 50px;
+    border-radius: 5px;
+  }
+</style>
+</head>
+<body>
+
+<h1>WatchIt?</h1>
+
+<div id="search-container">
+  <select id="movie-search" placeholder="Tapez un titre..."></select>
+</div>
+
+<div id="movie-details">
+  <h2 id="movie-title"></h2>
+  <img id="movie-poster" src="" alt="">
+  <p id="movie-overview"></p>
+  <p id="movie-vote"></p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+<script>
+const movieTitle = document.getElementById("movie-title");
+const moviePoster = document.getElementById("movie-poster");
+const movieOverview = document.getElementById("movie-overview");
+const movieVote = document.getElementById("movie-vote");
+
+new TomSelect("#movie-search", {
+    valueField: "value",
+    labelField: "text",
+    searchField: "text",
+    render: {
+      option: function(item, escape) {
+        return `<div>
+                  ${item.poster ? `<img src="${item.poster}" alt="${escape(item.value)}">` : ''}
+                  ${escape(item.text)}
+                </div>`;
+      }
+    },
+    load: function(query, callback) {
+        if (!query.length) return callback();
+        fetch(`http://127.0.0.1:8000/search_tmdb?movie_name=${encodeURIComponent(query)}`)
+          .then(res => res.json())
+          .then(data => callback(data))
+          .catch(() => callback());
+    },
+    onChange: function(value) {
+        if (!value) return;
+        const selected = this.options[value];
+        movieTitle.textContent = selected.text;
+        moviePoster.src = selected.poster || "";
+        movieOverview.textContent = selected.overview || "";
+        movieVote.textContent = selected.vote_average ? `⭐ Note: ${selected.vote_average}` : "";
+    }
+});
+</script>
+
+</body>
+</html>
