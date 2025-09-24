@@ -23,8 +23,7 @@
 
   /* Barre de recherche pleine largeur */
   #search-container {
-    width: 90%;
-    max-width: 600px;
+    width: 80%;
   }
 
   #movie-search {
@@ -40,12 +39,10 @@
   #movie-details {
     margin-top: 40px;
     text-align: center;
-    width: 90%;
-    max-width: 600px;
+    width: 80%;
   }
 
   #movie-details img {
-    max-width: 100%;
     border-radius: 10px;
     margin: 10px 0;
   }
@@ -55,6 +52,20 @@
     line-height: 1.4;
   }
 
+  #movie-body {
+    display: flex;           /* image + synopsis sur la même ligne */
+    gap: 20px;               /* espace entre l'image et le texte */
+    align-items: flex-start; /* aligne le texte avec le haut de l'image */
+  }
+
+  #movie-poster {
+    max-width: 200px;
+  }
+  
+  #movie-overview {
+    flex: 1;                 /* le texte prend le reste de la ligne */
+    line-height: 1.4;
+  }
   /* Résultats avec affiches dans TomSelect */
   .ts-dropdown .option {
     display: flex;
@@ -66,6 +77,12 @@
     width: 50px;
     border-radius: 5px;
   }
+
+  .ts-dropdown-content {
+    max-height : 300px;
+  }
+
+  
 </style>
 </head>
 <body>
@@ -78,9 +95,13 @@
 
 <div id="movie-details">
   <h2 id="movie-title"></h2>
-  <img id="movie-poster" src="" alt="">
-  <p id="movie-overview"></p>
-  <p id="movie-vote"></p>
+  <div id="movie-body">
+    <img id="movie-poster" src="" alt="">
+    <div>
+        <p id="movie-overview"></p>
+        <p id="movie-vote"></p>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
@@ -91,6 +112,7 @@ const movieOverview = document.getElementById("movie-overview");
 const movieVote = document.getElementById("movie-vote");
 
 new TomSelect("#movie-search", {
+    plugins: ["remove_button"],
     valueField: "value",
     labelField: "text",
     searchField: "text",
@@ -115,7 +137,7 @@ new TomSelect("#movie-search", {
         movieTitle.textContent = selected.text;
         moviePoster.src = selected.poster || "";
         movieOverview.textContent = selected.overview || "";
-        movieVote.textContent = selected.vote_average ? `⭐ Note: ${selected.vote_average}` : "";
+        movieVote.textContent = selected.vote_average ? `⭐ Note: ${selected.vote_average} / 10` : "";
     }
 });
 </script>

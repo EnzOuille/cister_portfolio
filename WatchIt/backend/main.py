@@ -15,7 +15,7 @@ app.add_middleware(
 )
 
 TMDB_READ_KEY = os.getenv("TMDB_READ_KEY", "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0MGFhZDdmMDczNzdhN2ZiNWMxOGU4MmY2NDBhYmI0YiIsIm5iZiI6MTc1NjkwNDc2Ni44MDE5OTk4LCJzdWIiOiI2OGI4M2QzZTVlMGQ0N2IwNzU4Y2Q3ZjYiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.MC-nQ0bU-z-Rm3vfhEHEnLmQIyGQWWqqXX9masn82oI")
-TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w200"  # taille de l'image
+TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w400"  # taille de l'image
 
 @app.get("/search_tmdb")
 def search_tmdb(movie_name: str = Query(..., description="Titre du film")):
@@ -32,7 +32,6 @@ def search_tmdb(movie_name: str = Query(..., description="Titre du film")):
 
     response = requests.get(url, params=params, headers=headers)
     data = response.json()
-    print(data)
 
     if "results" not in data or not data["results"]:
         return []
