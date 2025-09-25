@@ -39,7 +39,7 @@
   #movie-details {
     margin-top: 40px;
     text-align: center;
-    width: 80%;
+    width: 90%;
   }
 
   #movie-details img {
@@ -59,11 +59,10 @@
   }
 
   #movie-poster {
-    max-width: 200px;
+    width: 50%;
   }
   
   #movie-overview {
-    flex: 1;                 /* le texte prend le reste de la ligne */
     line-height: 1.4;
   }
   /* Résultats avec affiches dans TomSelect */
@@ -98,8 +97,10 @@
   <div id="movie-body">
     <img id="movie-poster" src="" alt="">
     <div>
-        <p id="movie-overview"></p>
-        <p id="movie-vote"></p>
+        <p id="movie-overview">Synopsis</p>
+        <p id="movie-imdb-vote">Vote Imdb</p>
+        <p id="movie-rottentomatoes-vote">Vote RottenTomatoes</p>
+        <p id="movie-metacritic-vote">Vote Metacritic</p>
     </div>
   </div>
 </div>
@@ -109,7 +110,9 @@
 const movieTitle = document.getElementById("movie-title");
 const moviePoster = document.getElementById("movie-poster");
 const movieOverview = document.getElementById("movie-overview");
-const movieVote = document.getElementById("movie-vote");
+const movieImdbVote = document.getElementById("movie-imdb-vote");
+const movieRottenTomatoesVote = document.getElementById("movie-rottentomatoes-vote");
+const movieMetacriticVote = document.getElementById("movie-metacritic-vote");
 
 new TomSelect("#movie-search", {
     plugins: ["remove_button"],
@@ -126,18 +129,41 @@ new TomSelect("#movie-search", {
     },
     load: function(query, callback) {
         if (!query.length) return callback();
-        fetch(`http://127.0.0.1:8000/search_tmdb?movie_name=${encodeURIComponent(query)}`)
+        fetch(`http://127.0.0.1:8000/search_omdb_tomselect?movie_name=${encodeURIComponent(query)}`)
           .then(res => res.json())
           .then(data => callback(data))
           .catch(() => callback());
     },
     onChange: function(value) {
         if (!value) return;
-        const selected = this.options[value];
-        movieTitle.textContent = `${selected.text} (ID : ${selected.id})` || "";
-        moviePoster.src = selected.poster || "";
-        movieOverview.textContent = selected.overview || "";
-        movieVote.textContent = selected.vote_average ? `⭐ Note: ${selected.vote_average} / 10` : "";
+        fetch(`http://127.0.0.1:8000/search_omdb_id?movie_id=${encodeURIComponent(value)}`)
+          .then(res => res.json())
+          .then(data => {
+            console.log(data);
+            movieTitle.textContent = data["title"];
+            moviePoster.src = data["poster"];
+            movieOverview.textContent = data["plot"];
+            for (const rating in data["ratings"]) {
+              rating_data = data["ratings"][rating]
+              if(rating_data["Source"] == "Internet Movie Database"){
+                movieImdbVote.textContent = "IMDB : " + rating_data["Value"];
+              }
+              if (rating_data["Source"] == "Rotten Tomatoes"){
+                movieRottenTomatoesVote.textContent = "Rotten Tomatoes : " + (parseFloat(rating_data["Value"]) / 10) + "/10";
+              }
+              if (rating_data["Source"] == "Metacritic"){
+                movieMetacriticVote.textContent = "Metacritic : " + (eval(rating_data["Value"]) * 10).toFixed(1) + "/10";
+              }
+            }
+          })
+          .catch(() => {
+            console.log("An error occured")
+          })
+        // const selected = this.options[value];
+        // movieTitle.textContent = `${selected.text} (ID : ${selected.id})` || "";
+        // moviePoster.src = selected.poster || "";
+        // movieOverview.textContent = selected.overview || "";
+        // movieVote.textContent = selected.vote_average ? `⭐ Note: ${selected.vote_average} / 10` : "";
     }
 });
 </script>
