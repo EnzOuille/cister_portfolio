@@ -39,13 +39,15 @@ def search_tmdb(movie_name: str = Query(..., description="Titre du film")):
     # Retourne tous les films au format TomSelect + poster complet
     results = []
     for movie in data["results"]:
+        print(movie)
         poster_url = TMDB_IMAGE_BASE + movie["poster_path"] if movie.get("poster_path") else ""
         results.append({
             "value": movie["title"],
             "text": f"{movie['title']} ({movie.get('release_date','')[:4]})",
             "poster": poster_url,
             "overview": movie.get("overview", ""),
-            "vote_average": movie.get("vote_average", 0)
+            "vote_average": movie.get("vote_average", 0),
+            "id": movie.get("id", "")
         })
 
     return results

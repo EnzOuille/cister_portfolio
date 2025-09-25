@@ -134,7 +134,7 @@ new TomSelect("#movie-search", {
     onChange: function(value) {
         if (!value) return;
         const selected = this.options[value];
-        movieTitle.textContent = selected.text;
+        movieTitle.textContent = `${selected.text} (ID : ${selected.id})` || "";
         moviePoster.src = selected.poster || "";
         movieOverview.textContent = selected.overview || "";
         movieVote.textContent = selected.vote_average ? `⭐ Note: ${selected.vote_average} / 10` : "";
